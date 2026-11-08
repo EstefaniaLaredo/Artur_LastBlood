@@ -1,10 +1,10 @@
-
 using UnityEngine;
 
+// Cámara ortográfica que sigue a Artur con límites configurables por cada escenario.
 public class CameraFollow : MonoBehaviour
 {
     [SerializeField] private Transform objetivo;
-    [SerializeField] private float suavidad = 5f;
+    [SerializeField] private float suavidad = 6f;
     [SerializeField] private Vector2 limitesMinimos = new Vector2(-14f, -8f);
     [SerializeField] private Vector2 limitesMaximos = new Vector2(14f, 8f);
     private Camera camara;
@@ -34,6 +34,12 @@ public class CameraFollow : MonoBehaviour
     public void Configurar(Transform nuevoObjetivo, Vector2 minimos, Vector2 maximos)
     {
         objetivo = nuevoObjetivo;
+        limitesMinimos = minimos;
+        limitesMaximos = maximos;
+    }
+
+    public void EstablecerLimites(Vector2 minimos, Vector2 maximos)
+    {
         limitesMinimos = minimos;
         limitesMaximos = maximos;
     }

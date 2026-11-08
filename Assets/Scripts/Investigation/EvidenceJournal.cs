@@ -1,15 +1,16 @@
-
-using UnityEngine;
-using TMPro;
 using System.Collections.Generic;
+using TMPro;
+using UnityEngine;
 
+// Diario de investigación ampliado con soporte para objetivos, estados de lugares, contactos y pistas.
 public class EvidenceJournal : MonoBehaviour
 {
     [SerializeField] private GameObject journalPanel;
     [SerializeField] private TMP_Text journalText;
 
     private readonly List<Pista> pistas = new List<Pista>();
-    private string objetivoActual = "Regresa a tu oficina y busca una respuesta.";
+    private readonly List<string> contactos = new List<string>();
+    private string objetivoActual = "Investiga tu oficina y busca respuestas.";
 
     public void Configurar(GameObject panel, TMP_Text texto)
     {
@@ -26,6 +27,9 @@ public class EvidenceJournal : MonoBehaviour
 
     private void Update()
     {
+        if (DialogueUI.EstaEnDialogo)
+            return;
+
         if (Input.GetKeyDown(KeyCode.J))
         {
             if (journalPanel != null)
@@ -35,16 +39,26 @@ public class EvidenceJournal : MonoBehaviour
 
     public void AgregarPista(string titulo, string descripcion)
     {
-        AgregarPista(titulo, descripcion, "Desconocido", "Fecha desconocida");
+        AgregarPista(titulo, descripcion, "Oficina de Artur", "Noche del 14 de octubre");
     }
 
     public void AgregarPista(string titulo, string descripcion, string lugar, string fecha)
     {
         if (pistas.Exists(p => p.titulo == titulo))
             return;
+
         pistas.Add(new Pista(titulo, descripcion, lugar, fecha));
         ActualizarDiario();
-        Debug.Log("Nueva pista agregada al diario.");
+        Debug.Log($"[DIARIO] Pista agregada: {titulo}");
+    }
+
+    public void AgregarContacto(string nombreYDetalle)
+    {
+        if (!contactos.Contains(nombreYDetalle))
+        {
+            contactos.Add(nombreYDetalle);
+            ActualizarDiario();
+        }
     }
 
     public void EstablecerObjetivo(string nuevoObjetivo)
@@ -53,23 +67,52 @@ public class EvidenceJournal : MonoBehaviour
         ActualizarDiario();
     }
 
+    public void RefrescarVista()
+    {
+        ActualizarDiario();
+    }
+
     private void ActualizarDiario()
     {
         if (journalText == null)
             return;
 
-        if (pistas.Count == 0)
+        string contenido = "<b><size=22><color=#FFC107>DIARIO DE INVESTIGACIÓN — ARTUR JONES</color></size></b>\n\n";
+
+        // Sección de Objetivo
+        contenido += "<b><color=#4FC3F7>OBJETIVO ACTUAL</color></b>\n" + objetivoActual + "\n\n";
+
+        // Sección de Estados de Lugares
+        if (LocationStateManager.Instancia != null)
         {
-            journalText.text =
-                "DIARIO DE INVESTIGACIÓN\n\nOBJETIVO\n" + objetivoActual +
-                "\n\nTodavía no encontraste pistas.";
-            return;
+            contenido += LocationStateManager.Instancia.GenerarTextoResumenLugares() + "\n";
         }
 
-        string contenido = "DIARIO DE INVESTIGACIÓN\n\nOBJETIVO\n" + objetivoActual + "\n\nPISTAS\n";
-        foreach (Pista pista in pistas)
-            contenido += "\n• " + pista.titulo + "\n" + pista.descripcion +
-                         "\nLugar: " + pista.lugar + "\nFecha: " + pista.fecha + "\n";
+        // Sección de Contactos
+        if (contactos.Count > 0)
+        {
+            contenido += "<b><color=#BA68C8>PERSONAJES Y CONTACTOS</color></b>\n";
+            foreach (string contacto in contactos)
+                contenido += $"• {contacto}\n";
+            contenido += "\n";
+        }
+
+        // Sección de Pistas
+        contenido += "<b><color=#FFD54F>EVIDENCIAS Y PISTAS REGISTRADAS</color></b>\n";
+        if (pistas.Count == 0)
+        {
+            contenido += "<i>Todavía no has recogido pistas.</i>\n";
+        }
+        else
+        {
+            foreach (Pista pista in pistas)
+            {
+                contenido += $"• <b>{pista.titulo}</b>\n";
+                contenido += $"  {pista.descripcion}\n";
+                contenido += $"  <i><color=#90A4AE>Lugar: {pista.lugar} | Fecha: {pista.fecha}</color></i>\n";
+            }
+        }
+
         journalText.text = contenido;
     }
 

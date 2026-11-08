@@ -1,9 +1,9 @@
-
 using UnityEngine;
 
+// Detecta objetos y personajes interactuables cercanos y ejecuta su acción con la tecla E.
 public class PlayerInteraction : MonoBehaviour
 {
-    [SerializeField] private float radioInteraccion = 1.35f;
+    [SerializeField] private float radioInteraccion = 1.4f;
     private InteractionPrompt prompt;
 
     private void Awake()
@@ -13,32 +13,47 @@ public class PlayerInteraction : MonoBehaviour
 
     private void Update()
     {
-        EvidenceInteractable cercana = ObtenerPistaCercana();
-        if (prompt != null)
-            prompt.Mostrar(cercana != null);
-
-        if (Input.GetKeyDown(KeyCode.E))
+        // Si el diario o un diálogo están abiertos, no interactuar con el entorno
+        if (DialogueUI.EstaEnDialogo)
         {
-            if (cercana != null)
-                cercana.Interactuar();
+            if (prompt != null)
+                prompt.Mostrar(false);
+            return;
+        }
+
+        IInteractable interactuable = ObtenerInteractuableCercano();
+
+        if (prompt != null)
+        {
+            if (interactuable != null)
+                prompt.Mostrar(true, interactuable.ObtenerTextoInteraccion());
+            else
+                prompt.Mostrar(false);
+        }
+
+        if (Input.GetKeyDown(KeyCode.E) && interactuable != null)
+        {
+            interactuable.Interactuar();
         }
     }
 
-    private EvidenceInteractable ObtenerPistaCercana()
+    private IInteractable ObtenerInteractuableCercano()
     {
         Collider2D[] objetos = Physics2D.OverlapCircleAll(transform.position, radioInteraccion);
-        EvidenceInteractable mejor = null;
-        float distancia = float.MaxValue;
+        IInteractable mejor = null;
+        float distanciaMinima = float.MaxValue;
+
         foreach (Collider2D objeto in objetos)
         {
-            EvidenceInteractable pista = objeto.GetComponent<EvidenceInteractable>();
-            if (pista == null || !pista.isActiveAndEnabled)
+            IInteractable interactuable = objeto.GetComponent<IInteractable>();
+            if (interactuable == null || !interactuable.PuedeInteractuar())
                 continue;
-            float nuevaDistancia = (objeto.transform.position - transform.position).sqrMagnitude;
-            if (nuevaDistancia < distancia)
+
+            float distanciaActual = (objeto.transform.position - transform.position).sqrMagnitude;
+            if (distanciaActual < distanciaMinima)
             {
-                distancia = nuevaDistancia;
-                mejor = pista;
+                distanciaMinima = distanciaActual;
+                mejor = interactuable;
             }
         }
         return mejor;

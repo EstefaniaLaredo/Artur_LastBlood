@@ -7,7 +7,7 @@ public class Phase1Runtime : MonoBehaviour
         PlayerMovement movimiento = FindFirstObjectByType<PlayerMovement>();
         CameraFollow camara = FindFirstObjectByType<CameraFollow>();
         if (movimiento != null && camara != null)
-            camara.Configurar(movimiento.transform, new Vector2(-14f, -8f), new Vector2(14f, 8f));
+            camara.Configurar(movimiento.transform, new Vector2(-20f, -12f), new Vector2(20f, 12f));
 
         EvidenceJournal diario = FindFirstObjectByType<EvidenceJournal>();
         ObjectiveHUD hud = FindFirstObjectByType<ObjectiveHUD>();

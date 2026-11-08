@@ -1,0 +1,18 @@
+CÓMO USAR TUS PROPIOS SPRITES O PLANTILLAS 2D:
+
+Si descargas sprites PNG (por ejemplo de itch.io, Kenney.nl o OpenGameArt),
+solo arrástralos a esta carpeta (Assets/Resources/Sprites/) con cualquiera de estos nombres
+y el juego los cargará automáticamente sin que tengas que tocar código:
+
+- Artur.png            -> Personaje principal (Artur Jones)
+- Enemigo.png          -> Todos los guardias y matones
+- NPC_ElCuervo.png     -> Informante del almacén
+- NPC_Valeria.png      -> Contacto del club nocturno
+- Pista.png            -> Documentos y carpetas de evidencia
+- Puerta.png           -> Puertas de entrada/salida
+- Muro.png             -> Paredes y muros
+- Suelo_Oficina.png    -> Suelo de la oficina
+- Suelo_Almacen.png    -> Suelo del almacén
+- Suelo_Club.png       -> Suelo del club nocturno
+- Asfalto_Calle.png    -> Suelo de la calle
+
